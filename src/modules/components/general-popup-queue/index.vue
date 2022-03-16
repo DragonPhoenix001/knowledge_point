@@ -12,6 +12,7 @@
 <script>
 import dome1 from './components/dome1'
 import dome2 from './components/dome2'
+import Queue from './mixins/queue.js'
 
 export default {
   name: 'general-popup-queue',
@@ -23,20 +24,37 @@ export default {
       isVisible: false,
       compId: null,
       compData: {},
-      showCloseIcon: false
+      showCloseIcon: false,
+      queue: new Queue({ manual: true })
     }
   },
   created() {
     window.eventBus.$on('showGeneralPopup', data => {
-      console.log(data)
-      this.compId = data.compId;
-      this.compData = data.compData;
-      this.showCloseIcon = data.showCloseIcon;
-      this.isVisible = true
+      console.log(this.queue.push)
+      this.queue.push(() => {
+        if (data) {
+          this.$nextTick(() => {
+            this.compId = data.compId;
+            this.compData = data.compData;
+            this.showCloseIcon = data.showCloseIcon;
+            this.isVisible = true
+          })
+        }
+      })
     })
     window.eventBus.$on('hideGeneralPopup', data => {
       this.isVisible = false
     })
+  },
+  watch: {
+    isVisible(newVal) {
+      if (!newVal) {
+        this.compId = null
+        this.$nextTick(() => {
+          this.queue.next()
+        })
+      }
+    }
   },
   mounted() {},
   methods: {

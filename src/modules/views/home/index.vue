@@ -22,6 +22,12 @@ export default {
           title: '我是变量标题'
         }
       })
+      window.eventBus.$emit('showGeneralPopup', {
+        compId: 'dome2',
+        compData: {
+          title: '我是模板'
+        }
+      })
     },
     initData() {
       window.eventBus.$emit('showGeneralPopup', {
